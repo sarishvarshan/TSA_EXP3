@@ -1,6 +1,7 @@
 # Ex.No: 03   COMPUTE THE AUTO FUNCTION(ACF)
-Date: 
-
+# Date: 02-09-2025
+# Name: Sarish Varshan V
+# Reg No: 212223230196
 ### AIM:
 To Compute the AutoCorrelation Function (ACF) of the data for the first 35 lags to determine the model
 type to fit the data.
@@ -11,33 +12,51 @@ type to fit the data.
 4. Store the results in an array
 5. Represent the result in graphical representation as given below.
 ### PROGRAM:
+```
 import matplotlib.pyplot as plt
-
 import numpy as np
+import pandas as pd
 
-data = [3, 16, 156, 47, 246, 176, 233, 140, 130,
-101, 166, 201, 200, 116, 118, 247,
-209, 52, 153, 232, 128, 27, 192, 168, 208,
-187, 228, 86, 30, 151, 18, 254,
-76, 112, 67, 244, 179, 150, 89, 49, 83, 147, 90,
-33, 6, 158, 80, 35, 186, 127]
+data = pd.read_csv('/content/blood_donor_dataset.csv')
 
-lags = range(35)
+data['created_at'] = pd.to_datetime(data['created_at'])
+data = data.set_index('created_at')
+
+daily_counts = data.resample('D').size()
+
+N = len(daily_counts)
+lags = range(min(35, N // 2)) 
+
+autocorr_values = []
+
+time_series_data = daily_counts
+
+mean_data = np.mean(time_series_data)
+variance_data = np.var(time_series_data)
+
+normalized_data = (time_series_data - mean_data) / np.sqrt(variance_data) if variance_data != 0 else (time_series_data - mean_data)
 
 
-#Pre-allocate autocorrelation table
+for lag in lags:
+    if lag == 0:
+        autocorr_values.append(1)
+    else:
 
-#Mean
+        auto_cov = np.sum((time_series_data[:-lag] - mean_data) * (time_series_data[lag:] - mean_data)) / N
+ 
+        autocorr_values.append(auto_cov / variance_data if variance_data != 0 else 0)
 
-#Variance
 
-#Normalized data
+plt.figure(figsize=(10, 6))
+plt.stem(lags, autocorr_values)
+plt.title('Autocorrelation of Daily Entry Counts')
+plt.xlabel('Lag (Days)')
+plt.ylabel('Autocorrelation')
+plt.grid(True)
+plt.show()
+```
+## OUTPUT:
+<img width="1170" height="702" alt="image" src="https://github.com/user-attachments/assets/1f82b806-d958-4ec5-8adf-24060903ad18" />
 
-#Go through lag components one-by-one
-
-#display the graph
-
-### OUTPUT:
-
-### RESULT:
+## RESULT:
         Thus we have successfully implemented the auto correlation function in python.
